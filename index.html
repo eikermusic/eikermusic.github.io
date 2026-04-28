@@ -1,0 +1,1082 @@
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eiker — Music Producer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: hsl(0 0% 4%);
+  --surface: hsl(0 0% 8%);
+  --border: hsl(0 0% 15%);
+  --text: hsl(0 0% 98%);
+  --muted: hsl(0 0% 60%);
+  --primary: hsl(74 100% 50%);
+  --primary-dim: hsla(74, 100%, 50%, 0.1);
+  --primary-border: hsla(74, 100%, 50%, 0.3);
+  --sans: 'Space Grotesk', sans-serif;
+  --display: 'Syne', sans-serif;
+}
+
+html { scroll-behavior: smooth; background: var(--bg); }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 400;
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--primary); color: #000; }
+
+/* GRAIN OVERLAY */
+.grain {
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+/* LAYOUT */
+main {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 96px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 128px;
+}
+
+/* ANIMATIONS */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+@keyframes wave {
+  0%, 100% { height: 10px; }
+  50% { height: 32px; }
+}
+
+.anim { opacity: 0; }
+.anim.visible { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.15s; }
+.delay-3 { animation-delay: 0.2s; }
+.delay-4 { animation-delay: 0.3s; }
+
+/* ── HERO ── */
+.hero { display: flex; flex-direction: column; gap: 24px; }
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  border: 1px solid var(--primary-border);
+  background: var(--primary-dim);
+  backdrop-filter: blur(4px);
+  width: fit-content;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.badge-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  animation: pulse 2s infinite;
+  flex-shrink: 0;
+}
+
+.hero-title {
+  font-family: var(--display);
+  font-size: clamp(72px, 14vw, 128px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.85;
+  color: var(--text);
+  text-transform: uppercase;
+}
+
+.hero-sub {
+  font-size: clamp(18px, 3vw, 30px);
+  font-weight: 300;
+  color: var(--muted);
+  max-width: 560px;
+}
+
+.hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 16px 32px;
+  background: var(--primary);
+  color: #000;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: none; cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-primary:hover { opacity: 0.9; }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 16px 32px;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.btn-secondary:hover { border-color: var(--text); }
+
+/* ── SECTION HEADERS ── */
+.section-title {
+  font-family: var(--display);
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+}
+
+/* ── TRACK CARDS ── */
+.tracks { display: flex; flex-direction: column; gap: 24px; }
+
+.track-card {
+  padding: 24px;
+  border: 1px solid var(--border);
+  background: hsla(0,0%,8%,0.6);
+  transition: border-color 0.3s, background 0.3s;
+}
+.track-card:hover {
+  border-color: hsla(74,100%,50%,0.5);
+  background: hsla(0,0%,8%,0.9);
+}
+
+.track-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.play-btn {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--primary-dim);
+  color: var(--primary);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
+}
+.play-btn:hover { background: var(--primary); color: #000; }
+.play-btn.disabled { opacity: 0.4; cursor: not-allowed; }
+.play-btn svg { pointer-events: none; }
+
+.track-info { flex: 1; }
+.track-name {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+
+.track-tag {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+.track-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 32px;
+  flex-shrink: 0;
+}
+.waveform-bar {
+  width: 4px;
+  height: 10px;
+  background: var(--primary);
+  transition: height 0.1s;
+}
+.waveform-bar.playing:nth-child(1) { animation: wave 1.2s ease-in-out infinite 0ms; }
+.waveform-bar.playing:nth-child(2) { animation: wave 1.2s ease-in-out infinite 200ms; }
+.waveform-bar.playing:nth-child(3) { animation: wave 1.2s ease-in-out infinite 400ms; }
+.waveform-bar.playing:nth-child(4) { animation: wave 1.2s ease-in-out infinite 600ms; }
+.waveform-bar.playing:nth-child(5) { animation: wave 1.2s ease-in-out infinite 800ms; }
+
+.track-yt-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 12px;
+  padding: 5px 12px;
+  border: 1px solid hsla(74,100%,50%,0.5);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+.track-yt-badge:hover { background: var(--primary); color: #000; }
+
+.track-embed {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+.track-embed iframe { display: block; width: 100%; }
+
+.track-attr {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.track-attr a { color: var(--muted); text-decoration: none; }
+.track-attr a:hover { color: var(--text); }
+
+/* ── A/B COMPARISON ── */
+.ab-wrapper { display: flex; flex-direction: column; gap: 24px; }
+.ab-header { text-align: center; }
+.ab-subtitle {
+  font-family: var(--display);
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+}
+.ab-meta {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ab-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.ab-card {
+  position: relative;
+  padding: 40px;
+  min-height: 220px;
+  border: 2px solid var(--border);
+  background: hsla(0,0%,8%,0.3);
+  cursor: pointer;
+  transition: border-color 0.3s, background 0.3s, opacity 0.3s, box-shadow 0.3s;
+  display: flex; flex-direction: column; justify-content: space-between;
+  user-select: none;
+}
+.ab-card:hover:not(.active) { border-color: var(--text); }
+
+.ab-card.active {
+  border-color: var(--primary);
+  background: hsla(74,100%,50%,0.05);
+  box-shadow: 0 0 40px -10px var(--primary);
+}
+.ab-card.dimmed { opacity: 0.4; border-color: hsla(0,0%,15%,0.5); }
+
+.ab-card-top {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.ab-play-circle {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text);
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.ab-card.active .ab-play-circle {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #000;
+}
+
+.ab-card-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ab-card.active .ab-card-label { color: var(--primary); }
+
+.ab-playing-badge {
+  position: absolute; top: 16px; right: 16px;
+  display: none;
+  align-items: center; gap: 6px;
+  font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--primary);
+}
+.ab-playing-badge .badge-dot { width: 6px; height: 6px; }
+.ab-card.active .ab-playing-badge { display: flex; }
+
+.ab-card-title {
+  font-family: var(--display);
+  font-size: clamp(28px, 5vw, 40px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+.ab-card-sub {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.ab-after-label { color: var(--primary); }
+
+.ab-stop-wrap { display: flex; justify-content: center; }
+.ab-stop {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 24px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0.3;
+  transition: opacity 0.2s, color 0.2s, border-color 0.2s;
+  pointer-events: none;
+}
+.ab-stop.active { opacity: 1; pointer-events: auto; }
+.ab-stop.active:hover { color: var(--text); border-color: var(--text); }
+
+/* PLACEHOLDER NOTICE */
+.placeholder-notice {
+  padding: 16px;
+  border: 1px dashed hsla(74,100%,50%,0.3);
+  background: hsla(74,100%,50%,0.03);
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  letter-spacing: 0.05em;
+}
+.placeholder-notice strong { color: var(--primary); }
+
+/* ── SERVICES ── */
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.service-item {
+  padding: 28px 0;
+  border-bottom: 1px solid hsla(0,0%,15%,0.5);
+  transition: border-color 0.2s;
+}
+.service-item:nth-child(odd) { padding-right: 40px; }
+.service-item:nth-child(even) { padding-left: 40px; border-left: 1px solid hsla(0,0%,15%,0.5); }
+.service-item:hover { border-bottom-color: hsla(74,100%,50%,0.5); }
+
+.service-name {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  margin-bottom: 8px;
+  transition: color 0.2s;
+}
+.service-item:hover .service-name { color: var(--primary); }
+.service-desc { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+.service-delivery {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── CONTACT ── */
+.contact-block {
+  padding: 64px;
+  border: 1px solid var(--border);
+  background: hsla(0,0%,8%,0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+}
+
+.contact-title {
+  font-family: var(--display);
+  font-size: clamp(40px, 7vw, 64px);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.contact-sub { font-size: 20px; color: var(--muted); font-weight: 300; }
+
+.btn-contact {
+  display: inline-flex;
+  padding: 20px 40px;
+  background: var(--text);
+  color: #000;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: none; cursor: pointer;
+  transition: opacity 0.2s;
+}
+.btn-contact:hover { opacity: 0.9; }
+
+.contact-microcopy {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.social-links { display: flex; gap: 24px; }
+.social-link {
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+  display: flex; align-items: center;
+}
+.social-link:hover { color: var(--primary); }
+.social-link svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── FOOTER ── */
+footer {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.footer-text {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── LANG TOGGLE ── */
+.lang-toggle {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  overflow: hidden;
+}
+.lang-btn {
+  padding: 7px 13px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+.lang-btn.active {
+  color: #000;
+  background: var(--primary);
+}
+.lang-btn:not(.active):hover { color: var(--text); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  main { padding: 64px 20px; gap: 80px; }
+  .ab-grid { grid-template-columns: 1fr; }
+  .ab-card { padding: 28px; min-height: 160px; }
+  .services-grid { grid-template-columns: 1fr; }
+  .service-item:nth-child(even) { padding-left: 0; border-left: none; }
+  .service-item:nth-child(odd) { padding-right: 0; }
+  .contact-block { padding: 32px 24px; }
+  .track-top { flex-wrap: wrap; }
+  .waveform { display: none; }
+  footer { justify-content: center; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<div class="lang-toggle" role="group" aria-label="Language selector">
+  <button class="lang-btn active" id="btn-en" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" id="btn-es" onclick="setLang('es')">ES</button>
+</div>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge anim visible">
+      <div class="badge-dot"></div>
+      <span data-i18n="badge">WORK LICENSED FOR INTERNATIONAL ADVERTISING — TWIX GLOBAL CAMPAIGN · SYNC LICENSING VERIFIED</span>
+    </div>
+    <h1 class="hero-title anim visible delay-1">EIKER</h1>
+    <p class="hero-sub anim visible delay-2" data-i18n="heroSub">Music producer and audio engineer for brands and content creators.</p>
+    <div class="hero-buttons anim visible delay-3">
+      <a href="mailto:lucasemanaguirre@gmail.com" class="btn-primary" data-i18n="btnWork">Work with me</a>
+      <a href="#work" class="btn-secondary">
+        <span data-i18n="btnListen">Listen</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- SELECTED WORK -->
+  <section id="work" scroll-mt="96px">
+    <h2 class="section-title anim" data-i18n="sectionWork">SELECTED WORK</h2>
+    <div class="tracks">
+
+      <!-- TRACK 1: Twix -->
+      <div class="track-card anim">
+        <div class="track-top">
+          <button class="play-btn disabled" id="play-0" aria-label="Play Twix - Two Is More Than One" onclick="toggleSC(0)">
+            <svg id="icon-0" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+          <div class="track-info">
+            <div class="track-name">
+              Twix — Two Is More Than One
+              <span class="track-tag">Commercial / Sync</span>
+            </div>
+            <div class="track-desc" data-i18n="track1Desc">Produced for international brand advertising. Sync license. Radio-ready.</div>
+          </div>
+          <div class="waveform" id="waveform-0">
+            <div class="waveform-bar"></div><div class="waveform-bar"></div>
+            <div class="waveform-bar"></div><div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+          </div>
+        </div>
+        <a href="https://www.youtube.com/watch?v=x7lBA5aX-iI&pp=ygUPdHdpeCBjb21tZXJjaWFs" target="_blank" rel="noreferrer" class="track-yt-badge" data-i18n="ytBadge">
+          Watch the ad on YouTube ↗
+        </a>
+        <div class="track-embed">
+          <!-- REEMPLAZÁ el src con tu link real de SoundCloud (embed) -->
+          <iframe id="sc-0" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay"
+            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A2307297299&color=%23171717&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=false"></iframe>
+          <div class="track-attr">
+            <a href="https://soundcloud.com/eiker11" target="_blank" rel="noreferrer">eiker11</a> ·
+            <a href="https://soundcloud.com/eiker11/molchat-doma-sudno" target="_blank" rel="noreferrer">Molchat Doma - Sudno (Instrumental Cover)</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRACK 2: Ghost Beat -->
+      <div class="track-card anim">
+        <div class="track-top">
+          <button class="play-btn disabled" id="play-1" aria-label="Play Ghost Beat" onclick="toggleSC(1)">
+            <svg id="icon-1" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </button>
+          <div class="track-info">
+            <div class="track-name">
+              Ghost Beat
+              <span class="track-tag">Ghost Production</span>
+            </div>
+            <div class="track-desc" data-i18n="track2Desc">Exclusive beat, mixed and mastered, vocal-ready.</div>
+          </div>
+          <div class="waveform" id="waveform-1">
+            <div class="waveform-bar"></div><div class="waveform-bar"></div>
+            <div class="waveform-bar"></div><div class="waveform-bar"></div>
+            <div class="waveform-bar"></div>
+          </div>
+        </div>
+        <div class="track-embed">
+          <!-- REEMPLAZÁ el src con tu link real de SoundCloud (embed) -->
+          <iframe id="sc-1" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay"
+            src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A2308087619&color=%23171717&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=true&visual=false"></iframe>
+          <div class="track-attr">
+            <a href="https://soundcloud.com/eiker11" target="_blank" rel="noreferrer">eiker11</a> ·
+            <a href="https://soundcloud.com/eiker11/plugg-type-beat-sadistic" target="_blank" rel="noreferrer">plugg type beat "sadistic"</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRACK 3: EP / Spotify -->
+      <div class="track-card anim">
+        <div class="track-top">
+          <div class="track-info">
+            <div class="track-name">
+              <span data-i18n="track3Name">Independent EP</span>
+              <span class="track-tag" data-i18n="track3Tag">Brand Sound</span>
+            </div>
+            <div class="track-desc" data-i18n="track3Desc">Full-scale production: Composed, mixed, and mastered.</div>
+          </div>
+        </div>
+        <div class="track-embed">
+          <!-- REEMPLAZÁ con tu link real de Spotify (embed) -->
+          <iframe style="border-radius:0"
+            src="https://open.spotify.com/embed/track/4QdAk4NlugXnB5nKwySppP?utm_source=generator"
+            width="100%" height="352" frameBorder="0" allowfullscreen=""
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"></iframe>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- A/B COMPARISON -->
+  <section>
+    <h2 class="section-title anim" data-i18n="sectionAB">AUDIO RESTORATION</h2>
+    <div class="ab-wrapper">
+      <div class="ab-header anim">
+        <div class="ab-subtitle" data-i18n="abSubtitle">MIX & PRODUCTION: A/B COMPARISON</div>
+        <div class="ab-meta" data-i18n="abMeta">DEMO / RAW VS. FINAL MIX</div>
+      </div>
+
+      <div class="ab-grid anim">
+        <!-- BEFORE -->
+        <div class="ab-card" id="ab-before" onclick="playAB('before')">
+          <div class="ab-playing-badge">
+            <div class="badge-dot"></div>
+            <span data-i18n="abPlaying">PLAYING</span>
+          </div>
+          <div class="ab-card-top">
+            <div class="ab-play-circle" id="ab-before-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <div class="ab-card-label" data-i18n="abRawLabel">RAW TAKE</div>
+          </div>
+          <div>
+            <div class="ab-card-title" data-i18n="abBeforeTitle">BEFORE</div>
+            <div class="ab-card-sub" data-i18n="abBeforeSub">(DEMO / RAW)</div>
+          </div>
+        </div>
+
+        <!-- AFTER -->
+        <div class="ab-card" id="ab-after" onclick="playAB('after')">
+          <div class="ab-playing-badge">
+            <div class="badge-dot"></div>
+            <span data-i18n="abPlaying">PLAYING</span>
+          </div>
+          <div class="ab-card-top">
+            <div class="ab-play-circle" id="ab-after-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
+            <div class="ab-card-label ab-after-label" data-i18n="abMasteredLabel">MASTERED</div>
+          </div>
+          <div>
+            <div class="ab-card-title" data-i18n="abAfterTitle">AFTER</div>
+            <div class="ab-card-sub" data-i18n="abAfterSub">(FINAL MIX)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ab-stop-wrap anim">
+        <button class="ab-stop" id="ab-stop-btn" onclick="stopAB()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18"/></svg>
+          STOP
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section>
+    <h2 class="section-title anim" data-i18n="sectionServices">SERVICES</h2>
+    <div class="services-grid">
+      <div class="service-item anim">
+        <div class="service-name" data-i18n="s1Name">Commercial Music Production</div>
+        <div class="service-desc" data-i18n="s1Desc">Original track for advertising, brand campaigns or sync licensing.</div>
+        <div class="service-delivery" data-i18n="s1Del">Delivery: 5–7 days</div>
+      </div>
+      <div class="service-item anim delay-1">
+        <div class="service-name" data-i18n="s2Name">Ghost Production</div>
+        <div class="service-desc" data-i18n="s2Desc">Complete exclusive beat, mixed and mastered. No credit.</div>
+        <div class="service-delivery" data-i18n="s2Del">Delivery: 3–5 days</div>
+      </div>
+      <div class="service-item anim">
+        <div class="service-name" data-i18n="s3Name">Brand Sound Package</div>
+        <div class="service-desc" data-i18n="s3Desc">Jingle + intro/outro + 2 background variations for YouTubers, podcasters and streamers.</div>
+        <div class="service-delivery" data-i18n="s3Del">Delivery: 5 days</div>
+      </div>
+      <div class="service-item anim delay-1">
+        <div class="service-name" data-i18n="s4Name">Podcast Editing</div>
+        <div class="service-desc" data-i18n="s4Desc">Full episode editing, noise removal, leveling and mastering for publishing.</div>
+        <div class="service-delivery" data-i18n="s4Del">Delivery: 2–3 days</div>
+      </div>
+      <div class="service-item anim">
+        <div class="service-name" data-i18n="s5Name">Voice & Dialogue Mixing</div>
+        <div class="service-desc" data-i18n="s5Desc">Mixing and processing of voice recordings for content, ads or narration.</div>
+        <div class="service-delivery" data-i18n="s5Del">Delivery: 2–3 days</div>
+      </div>
+      <div class="service-item anim delay-1">
+        <div class="service-name" data-i18n="s6Name">Audio Editing</div>
+        <div class="service-desc" data-i18n="s6Desc">Cuts, cleanup, arrangement and export of audio for any format.</div>
+        <div class="service-delivery" data-i18n="s6Del">Delivery: 1–2 days</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section>
+    <div class="contact-block anim">
+      <h2 class="contact-title" data-i18n="contactTitle">READY TO WORK?</h2>
+      <p class="contact-sub" data-i18n="contactSub">Tell me what you need. Direct, no agencies, no waitlists.</p>
+      <a href="mailto:lucasemanaguirre@gmail.com" class="btn-contact" data-i18n="btnContact">WRITE ME</a>
+      <div class="contact-microcopy" data-i18n="contactMicro">COMMERCIAL RIGHTS INCLUDED · FAST DELIVERY</div>
+      <div class="social-links">
+        <a href="https://instagram.com/no.colapsar" target="_blank" rel="noreferrer" class="social-link" aria-label="Instagram">
+          <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+        <a href="https://youtube.com/eikerr" target="_blank" rel="noreferrer" class="social-link" aria-label="YouTube">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="currentColor" stroke="none"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="var(--bg)" stroke="none"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span class="footer-text" data-i18n="footerLeft">EIKER — MUSIC PRODUCER</span>
+  <span class="footer-text" data-i18n="footerRight">SYNC LICENSING VERIFIED · INTERNATIONAL CREDITS</span>
+</footer>
+
+<script>
+// ── SOUNDCLOUD WIDGET API ──────────────────────────────
+const SC_WIDGET_URL = 'https://w.soundcloud.com/player/api.js';
+let scReady = false;
+let scWidgets = [];
+let scPlaying = [false, false];
+
+function loadSCApi() {
+  const script = document.createElement('script');
+  script.src = SC_WIDGET_URL;
+  script.onload = () => {
+    scReady = true;
+    const iframes = [document.getElementById('sc-0'), document.getElementById('sc-1')];
+    iframes.forEach((iframe, i) => {
+      if (!iframe) return;
+      const widget = SC.Widget(iframe);
+      scWidgets[i] = widget;
+      widget.bind(SC.Widget.Events.READY, () => {
+        const btn = document.getElementById('play-' + i);
+        if (btn) btn.classList.remove('disabled');
+      });
+      widget.bind(SC.Widget.Events.PLAY, () => {
+        scPlaying[i] = true;
+        updatePlayBtn(i, true);
+      });
+      widget.bind(SC.Widget.Events.PAUSE, () => {
+        scPlaying[i] = false;
+        updatePlayBtn(i, false);
+      });
+      widget.bind(SC.Widget.Events.FINISH, () => {
+        scPlaying[i] = false;
+        updatePlayBtn(i, false);
+      });
+    });
+  };
+  document.head.appendChild(script);
+}
+
+function toggleSC(index) {
+  if (!scReady || !scWidgets[index]) return;
+  if (scPlaying[index]) {
+    scWidgets[index].pause();
+  } else {
+    scWidgets.forEach((w, i) => { if (i !== index && w) w.pause(); });
+    scWidgets[index].play();
+  }
+}
+
+function updatePlayBtn(index, playing) {
+  const btn = document.getElementById('play-' + index);
+  const icon = document.getElementById('icon-' + index);
+  const waveform = document.getElementById('waveform-' + index);
+  if (!btn || !icon) return;
+  if (playing) {
+    icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    btn.setAttribute('aria-label', 'Pause track');
+    if (waveform) waveform.querySelectorAll('.waveform-bar').forEach(b => b.classList.add('playing'));
+  } else {
+    icon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+    btn.setAttribute('aria-label', 'Play track');
+    if (waveform) waveform.querySelectorAll('.waveform-bar').forEach(b => b.classList.remove('playing'));
+  }
+}
+
+loadSCApi();
+
+// ── A/B COMPARISON ────────────────────────────────────
+// PLACEHOLDER: reemplazá estas rutas con tus archivos MP3 reales
+const AB_FILES = {
+  before: './audio/raw.mp3',   // <-- TU ARCHIVO "ANTES"
+  after:  './audio/final.mp3'  // <-- TU ARCHIVO "DESPUÉS"
+};
+
+let abAudios = {};
+let abCurrent = null;
+
+function getAudio(side) {
+  if (!abAudios[side]) {
+    abAudios[side] = new Audio(AB_FILES[side]);
+    abAudios[side].addEventListener('ended', () => stopAB());
+  }
+  return abAudios[side];
+}
+
+function playAB(side) {
+  const other = side === 'before' ? 'after' : 'before';
+
+  // Si ya está sonando este lado, pausar
+  if (abCurrent === side) {
+    stopAB();
+    return;
+  }
+
+  // Parar el otro si suena
+  if (abAudios[other]) {
+    abAudios[other].pause();
+    abAudios[other].currentTime = 0;
+  }
+
+  const audio = getAudio(side);
+  audio.currentTime = 0;
+  audio.play().catch(() => {}); // catch por política de autoplay en algunos navegadores
+  abCurrent = side;
+  updateABState(side);
+}
+
+function stopAB() {
+  ['before','after'].forEach(s => {
+    if (abAudios[s]) { abAudios[s].pause(); abAudios[s].currentTime = 0; }
+  });
+  abCurrent = null;
+  updateABState(null);
+}
+
+function updateABState(activeSide) {
+  const cards = { before: document.getElementById('ab-before'), after: document.getElementById('ab-after') };
+  const stopBtn = document.getElementById('ab-stop-btn');
+  const pauseIcon = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+  const playIcon  = '<polygon points="5 3 19 12 5 21 5 3"/>';
+
+  Object.keys(cards).forEach(side => {
+    const card = cards[side];
+    const icon = card.querySelector('.ab-play-circle svg');
+    if (side === activeSide) {
+      card.classList.add('active');
+      card.classList.remove('dimmed');
+      if (icon) icon.innerHTML = pauseIcon;
+    } else if (activeSide !== null) {
+      card.classList.remove('active');
+      card.classList.add('dimmed');
+      if (icon) icon.innerHTML = playIcon;
+    } else {
+      card.classList.remove('active','dimmed');
+      if (icon) icon.innerHTML = playIcon;
+    }
+  });
+
+  if (stopBtn) {
+    activeSide ? stopBtn.classList.add('active') : stopBtn.classList.remove('active');
+  }
+}
+
+// ── i18n ──────────────────────────────────────────────
+const i18n = {
+  en: {
+    badge:          'WORK LICENSED FOR INTERNATIONAL ADVERTISING — TWIX GLOBAL CAMPAIGN · SYNC LICENSING VERIFIED',
+    heroSub:        'Music producer and audio engineer for brands and content creators.',
+    btnWork:        'Work with me',
+    btnListen:      'Listen',
+    sectionWork:    'SELECTED WORK',
+    track1Desc:     'Produced for international brand advertising. Sync license. Radio-ready.',
+    ytBadge:        'Watch the ad on YouTube ↗',
+    track2Desc:     'Exclusive beat, mixed and mastered, vocal-ready.',
+    track3Name:     'Independent EP',
+    track3Tag:      'Brand Sound',
+    track3Desc:     'Full-scale production: Composed, mixed, and mastered.',
+    sectionAB:      'AUDIO RESTORATION',
+    abSubtitle:     'MIX & PRODUCTION: A/B COMPARISON',
+    abMeta:         'DEMO / RAW VS. FINAL MIX',
+    abPlaying:      'PLAYING',
+    abRawLabel:     'RAW TAKE',
+    abBeforeTitle:  'BEFORE',
+    abBeforeSub:    '(DEMO / RAW)',
+    abMasteredLabel:'MASTERED',
+    abAfterTitle:   'AFTER',
+    abAfterSub:     '(FINAL MIX)',
+    sectionServices:'SERVICES',
+    s1Name: 'Commercial Music Production',
+    s1Desc: 'Original track for advertising, brand campaigns or sync licensing.',
+    s1Del:  'Delivery: 5–7 days',
+    s2Name: 'Ghost Production',
+    s2Desc: 'Complete exclusive beat, mixed and mastered. No credit.',
+    s2Del:  'Delivery: 3–5 days',
+    s3Name: 'Brand Sound Package',
+    s3Desc: 'Jingle + intro/outro + 2 background variations for YouTubers, podcasters and streamers.',
+    s3Del:  'Delivery: 5 days',
+    s4Name: 'Podcast Editing',
+    s4Desc: 'Full episode editing, noise removal, leveling and mastering for publishing.',
+    s4Del:  'Delivery: 2–3 days',
+    s5Name: 'Voice & Dialogue Mixing',
+    s5Desc: 'Mixing and processing of voice recordings for content, ads or narration.',
+    s5Del:  'Delivery: 2–3 days',
+    s6Name: 'Audio Editing',
+    s6Desc: 'Cuts, cleanup, arrangement and export of audio for any format.',
+    s6Del:  'Delivery: 1–2 days',
+    contactTitle: 'READY TO WORK?',
+    contactSub:   'Tell me what you need. Direct, no agencies, no waitlists.',
+    btnContact:   'WRITE ME',
+    contactMicro: 'COMMERCIAL RIGHTS INCLUDED · FAST DELIVERY',
+    footerLeft:   'EIKER — MUSIC PRODUCER',
+    footerRight:  'SYNC LICENSING VERIFIED · INTERNATIONAL CREDITS',
+  },
+  es: {
+    badge:          'TRABAJO LICENCIADO PARA PUBLICIDAD INTERNACIONAL — CAMPAÑA GLOBAL DE TWIX · SYNC LICENSING VERIFICADO',
+    heroSub:        'Productor musical e ingeniero de audio para marcas y creadores de contenido.',
+    btnWork:        'Trabajemos',
+    btnListen:      'Escuchar',
+    sectionWork:    'TRABAJO SELECCIONADO',
+    track1Desc:     'Producido para campaña publicitaria internacional. Licencia sync. Listo para radio.',
+    ytBadge:        'Ver la publicidad en YouTube ↗',
+    track2Desc:     'Beat exclusivo, mezclado y masterizado, listo para vocal.',
+    track3Name:     'EP Independiente',
+    track3Tag:      'Sonido de Marca',
+    track3Desc:     'Producción completa: compuesto, mezclado y masterizado.',
+    sectionAB:      'RESTAURACIÓN DE AUDIO',
+    abSubtitle:     'MEZCLA Y PRODUCCIÓN: COMPARACIÓN A/B',
+    abMeta:         'DEMO / CRUDO VS. MEZCLA FINAL',
+    abPlaying:      'REPRODUCIENDO',
+    abRawLabel:     'TOMA CRUDA',
+    abBeforeTitle:  'ANTES',
+    abBeforeSub:    '(DEMO / CRUDO)',
+    abMasteredLabel:'MASTERIZADO',
+    abAfterTitle:   'DESPUÉS',
+    abAfterSub:     '(MEZCLA FINAL)',
+    sectionServices:'SERVICIOS',
+    s1Name: 'Producción Musical Comercial',
+    s1Desc: 'Track original para publicidad, campañas de marca o sync licensing.',
+    s1Del:  'Entrega: 5–7 días',
+    s2Name: 'Ghost Production',
+    s2Desc: 'Beat exclusivo completo, mezclado y masterizado. Sin crédito al productor.',
+    s2Del:  'Entrega: 3–5 días',
+    s3Name: 'Paquete de Sonido para Marca',
+    s3Desc: 'Jingle + intro/outro + 2 variaciones de fondo para YouTubers, podcasters y streamers.',
+    s3Del:  'Entrega: 5 días',
+    s4Name: 'Edición de Podcast',
+    s4Desc: 'Edición completa de episodio, eliminación de ruido, nivelación y masterización.',
+    s4Del:  'Entrega: 2–3 días',
+    s5Name: 'Mezcla de Voz y Diálogo',
+    s5Desc: 'Mezcla y procesamiento de voces para contenido, publicidad o narración.',
+    s5Del:  'Entrega: 2–3 días',
+    s6Name: 'Edición de Audio',
+    s6Desc: 'Cortes, limpieza, arreglo y exportación de audio para cualquier formato.',
+    s6Del:  'Entrega: 1–2 días',
+    contactTitle: '¿LISTO PARA TRABAJAR?',
+    contactSub:   'Contame qué necesitás. Directo, sin agencias, sin listas de espera.',
+    btnContact:   'ESCRIBIME',
+    contactMicro: 'DERECHOS COMERCIALES INCLUIDOS · ENTREGA RÁPIDA',
+    footerLeft:   'EIKER — PRODUCTOR MUSICAL',
+    footerRight:  'SYNC LICENSING VERIFICADO · CRÉDITOS INTERNACIONALES',
+  }
+};
+
+let currentLang = 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  const dict = i18n[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key] !== undefined) el.textContent = dict[key];
+  });
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+  document.documentElement.lang = lang;
+}
+
+// Auto-detect browser language on load
+const browserLang = navigator.language || navigator.userLanguage || 'en';
+if (browserLang.startsWith('es')) setLang('es');
+
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.anim:not(.visible)').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
